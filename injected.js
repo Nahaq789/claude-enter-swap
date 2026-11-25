@@ -15,10 +15,11 @@ const keyOf = (type, options) => {
 const wrap = (listener) => function(e) {
     // OFF のときは何もしない（属性が未設定の間は ON 扱い）
     const enabled = document.documentElement.dataset.enterSwap !== 'off';
-    // contenteditable内でEnter単体のとき → このリスナーをスキップ（送信させない）
+    // 入力欄（contenteditable / textarea）でEnter単体のとき → このリスナーをスキップ（送信させない）
+    // Claude は contenteditable、ChatGPT は textarea の入力欄を使っている
     if (enabled && e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
         const el = document.activeElement;
-        if (el && el.getAttribute('contenteditable') === 'true') return;
+        if (el && (el.isContentEditable || el.tagName === 'TEXTAREA')) return;
     }
     return typeof listener === 'function'
         ? listener.call(this, e)
